@@ -1,30 +1,11 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { useTheme } from '@/context/ThemeProvider'
 
 const Navbar = () => {
-  // Initialize theme from localStorage or default to 'light'
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') || 'light'
-    }
-    return 'light'
-  })
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    // Apply theme class to document
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    // Save theme preference to localStorage
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light')
-  }
 
   return (
     <nav className="bg-gradient-to-r from-yellow-600 to-yellow-800 p-4 dark:from-blue-500 dark:to-purple-500 shadow-lg">
@@ -38,9 +19,9 @@ const Navbar = () => {
             className="relative w-16 h-8 bg-gray-300 rounded-full cursor-pointer dark:bg-gray-700"
           >
             <div 
-              className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center transform transition-transform duration-500 ${theme === 'light' ? '' : 'translate-x-8'}`}
+              className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center transform transition-transform duration-500 ${theme === 'dark' ? 'translate-x-8' : ''}`}
             >
-              {theme === 'light' ? '☀️' : '🌙'}
+              {theme === 'dark' ? '🌙': '☀️'}
             </div>
           </div>
         </div>
