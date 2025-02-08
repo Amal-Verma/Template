@@ -1,17 +1,57 @@
 "use client"
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from './Card'
 import Button from './Button'
 
 const Page = () => {
-  const [username, setUsername] = React.useState('')
-  const [firstName, setFirstName] = React.useState('')
-  const [lastName, setLastName] = React.useState('')
-  const [mobile, setMobile] = React.useState('')
-  const [dob, setDob] = React.useState('')
-  const [gender, setGender] = React.useState('')
-  const [isAdmin, setIsAdmin] = React.useState(true)
+  const [username, setUsername] = useState('')
+  const [repositories, setRepositories] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [currentRepo, setCurrentRepo] = useState(null)
+  const [collaborators, setCollaborators] = useState([])
+  const [newCollaborator, setNewCollaborator] = useState('')
+  const [accessType, setAccessType] = useState('view')
+
+  useEffect(() => {
+    // Fetch user data and repositories
+    setUsername('JohnDoe')
+    setRepositories([
+      { name: 'Repo1' },
+      { name: 'Repo2' },
+      { name: 'Repo3' }
+    ])
+  }, [])
+
+  const handleManageAccess = (repoName) => {
+    setCurrentRepo(repoName)
+    setShowModal(true)
+    // Fetch collaborators for the repo
+    setCollaborators([
+      { name: 'User1', access: 'view' },
+      { name: 'User2', access: 'edit' }
+    ])
+  }
+
+  const handleDeleteRepo = (repoName) => {
+    // Logic to delete repository
+    console.log(`Delete repository ${repoName}`)
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setCurrentRepo(null)
+    setNewCollaborator('')
+    setAccessType('view')
+  }
+
+  const handleAddCollaborator = () => {
+    // Logic to add collaborator
+    console.log(`Add ${newCollaborator} with ${accessType} access to ${currentRepo}`)
+    setCollaborators([...collaborators, { name: newCollaborator, access: accessType }])
+    setNewCollaborator('')
+    setAccessType('view')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-100 p-6 dark:from-[#1a1a2e] dark:via-[#1a1a2e] dark:to-[#1a1a2e]">
@@ -25,82 +65,92 @@ const Page = () => {
               </h1>
               <p className="text-gray-600 dark:text-gray-400">Here's your personal dashboard</p>
             </div>
-            <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
-              {isAdmin && (
-                <>
-                  <Button 
-                    onClick={() => window.location.href = '/admin'}
-                    className="btn btn-primary px-6 rounded-full flex items-center gap-2 transform hover:scale-105 transition-all dark:bg-blue-600 dark:hover:bg-blue-700"
-                    icon="👑"
-                    label="Admin Panel"
-                  />
-                  <Button 
-                    onClick={() => window.location.href = '/delete-account-permanently'}
-                    className="btn bg-red-100 text-red-800 hover:bg-red-200 px-6 rounded-full flex items-center gap-2 dark:bg-red-700 dark:text-red-200 dark:hover:bg-red-600"
-                    icon="⚠️"
-                    label="Admin Delete"
-                  />
-                </>
-              )}
-              <Button 
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.href = '/login';
-                }}
-                className="btn bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-6 rounded-full flex items-center gap-2 dark:bg-yellow-700 dark:text-yellow-200 dark:hover:bg-yellow-600"
-                icon="👋"
-                label="Logout"
-              />
-            </div>
+            <Button 
+              onClick={() => {
+                // Logic to add a new repository
+                console.log('Add new repository')
+              }}
+              className="btn bg-green-100 text-green-800 hover:bg-green-200 px-6 rounded-full flex items-center gap-2 dark:bg-green-700 dark:text-green-200 dark:hover:bg-green-600"
+              icon="➕"
+              label="Add Repo"
+            />
           </div>
 
-          {/* User info cards */}
+          {/* Repositories info cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { label: "Username", value: username, icon: "👤", color: "from-blue-50 to-blue-100 dark:from-blue-700 dark:to-blue-500" },
-              { label: "First Name", value: firstName, icon: "📝", color: "from-green-50 to-green-100 dark:from-green-700 dark:to-green-500" },
-              { label: "Last Name", value: lastName, icon: "📝", color: "from-purple-50 to-purple-100 dark:from-purple-700 dark:to-purple-500" },
-              { label: "Mobile", value: mobile, icon: "📱", color: "from-pink-50 to-pink-100 dark:from-pink-700 dark:to-pink-500" },
-              { label: "Date of Birth", value: dob, icon: "🎂", color: "from-orange-50 to-orange-100 dark:from-orange-700 dark:to-orange-500" },
-              { label: "Gender", value: gender, icon: "👥", color: "from-teal-50 to-teal-100 dark:from-teal-700 dark:to-teal-500" }
-            ].map((item, index) => (
+            {repositories.map((repo, index) => (
               <Card 
                 key={index}
                 index={index}
-                icon={item.icon}
-                label={item.label}
-                value={item.value}
-                color={item.color}
+                icon="📁"
+                label={repo.name}
+                value={`Repository ${index + 1}`}
+                color="from-blue-50 to-blue-100 dark:from-blue-700 dark:to-blue-500"
+                onAddCollaborator={() => handleManageAccess(repo.name)}
+                onDeleteRepo={() => handleDeleteRepo(repo.name)}
               />
             ))}
           </div>
-
-          {/* Action buttons section */}
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Button 
-              href="/forgot-password" 
-              className="btn bg-blue-100 text-blue-800 hover:bg-blue-200 px-6 rounded-full flex items-center gap-2 dark:bg-blue-700 dark:text-blue-200 dark:hover:bg-blue-600"
-              icon="🔑"
-              label="Reset Password"
-            />
-            <Button 
-              href="/delete-account" 
-              className="btn bg-red-100 text-red-800 hover:bg-red-200 px-6 rounded-full flex items-center gap-2 dark:bg-red-700 dark:text-red-200 dark:hover:bg-red-600"
-              icon="🗑️"
-              label="Delete Account"
-            />
-          </div>
-
-          {/* <div className="mt-8 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Need to update your information? 
-              <a href="/profile/edit" className="text-yellow-600 hover:text-yellow-700 ml-2 font-medium dark:text-blue-400 dark:hover:text-blue-500">
-                Edit Profile ✏️
-              </a>
-            </p>
-          </div> */}
         </div>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 w-96">
+            <h2 className="text-xl font-bold mb-4">Manage Access: {currentRepo}</h2>
+            <div className="mb-4">
+              <input 
+                type="text" 
+                value={newCollaborator}
+                onChange={(e) => setNewCollaborator(e.target.value)}
+                placeholder="Enter username"
+                className="w-full p-2 border rounded mb-2 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+              />
+              <select 
+                value={accessType}
+                onChange={(e) => setAccessType(e.target.value)}
+                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+              >
+                <option value="view">View</option>
+                <option value="edit">Edit</option>
+              </select>
+              <button 
+                onClick={handleAddCollaborator}
+                className="btn bg-green-100 text-green-800 hover:bg-green-200 px-4 py-2 rounded-full dark:bg-green-700 dark:text-green-200 dark:hover:bg-green-600 mt-2"
+              >
+                Add Collaborator
+              </button>
+            </div>
+            <div className="mb-4">
+              <h3 className="font-bold mb-2">Current Collaborators</h3>
+              <ul>
+                {collaborators.map((collab, index) => (
+                  <li key={index} className="flex justify-between items-center mb-2">
+                    <span>{collab.name} ({collab.access})</span>
+                    <button 
+                      onClick={() => {
+                        // Logic to remove collaborator
+                        console.log(`Remove ${collab.name} from ${currentRepo}`)
+                        setCollaborators(collaborators.filter(c => c.name !== collab.name))
+                      }}
+                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-600"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button 
+              onClick={handleCloseModal}
+              className="btn bg-gray-100 text-gray-800 hover:bg-gray-200 px-4 py-2 rounded-full dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 mt-4"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
